@@ -13,3 +13,9 @@
 
 # Dependency directories
 vendor/
+
+# .env file with secrets
+.env
+
+# Executable
+udemy-api-data
