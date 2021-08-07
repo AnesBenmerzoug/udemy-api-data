@@ -18,4 +18,4 @@ vendor/
 .env
 
 # Executable
-udemy-api-data
+bin/
