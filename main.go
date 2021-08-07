@@ -1,12 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 
+	endpoints "github.com/AnesBenmerzoug/udemy-api-data/internal/endpoints"
 	"github.com/joho/godotenv"
 )
 
@@ -24,23 +23,10 @@ func init() {
 
 func main() {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://www.udemy.com/api-2.0/courses/", nil)
+	courses, err := endpoints.GetCourses(client, CLIENT_ID, CLIENT_SECRET)
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "error: %v\n", err)
 		os.Exit(1)
 	}
-	req.SetBasicAuth(CLIENT_ID, CLIENT_SECRET)
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	defer resp.Body.Close()
-	json.NewDecoder(resp.Body).Decode(target)
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Println(body)
+	fmt.Println(courses)
 }
