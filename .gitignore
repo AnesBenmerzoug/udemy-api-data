@@ -19,3 +19,6 @@ vendor/
 
 # Executable
 bin/
+
+# Data
+data/
