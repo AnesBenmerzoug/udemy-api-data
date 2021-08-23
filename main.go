@@ -8,8 +8,7 @@ import (
 	"path"
 	"time"
 
-	dataTypes "github.com/AnesBenmerzoug/udemy-api-data/internal/data_types"
-	endpoints "github.com/AnesBenmerzoug/udemy-api-data/internal/endpoints"
+	internal "github.com/AnesBenmerzoug/udemy-api-data/internal"
 	"github.com/gocarina/gocsv"
 	"github.com/joho/godotenv"
 )
@@ -35,19 +34,19 @@ func init() {
 func main() {
 	client := &http.Client{}
 	context := context.Background()
-	coursesChannel := make(chan *dataTypes.Course, 100)
+	coursesChannel := make(chan *internal.Course, 100)
 	coursesFile, err := os.OpenFile(COURSES_DATA_FILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
 	defer coursesFile.Close()
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
 	go func() {
-		err := endpoints.GetCourses(context, client, CLIENT_ID, CLIENT_SECRET, coursesChannel)
+		err := internal.GetCourses(context, client, CLIENT_ID, CLIENT_SECRET, coursesChannel)
 		if err != nil {
 			log.Fatalf("error: %v\n", err)
 		}
 	}()
-	var courses []*dataTypes.Course
+	var courses []*internal.Course
 	for {
 		select {
 		case course, ok := <-coursesChannel:

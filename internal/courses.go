@@ -1,15 +1,13 @@
-package endpoints
+package internal
 
 import (
 	"context"
 	"encoding/json"
 	"log"
 	"net/http"
-
-	dataTypes "github.com/AnesBenmerzoug/udemy-api-data/internal/data_types"
 )
 
-func GetCourses(ctx context.Context, client *http.Client, client_id, client_secret string, ch chan *dataTypes.Course) error {
+func GetCourses(ctx context.Context, client *http.Client, client_id, client_secret string, ch chan *Course) error {
 	log.Print("Getting Courses data from the api")
 	page := 1
 	defer close(ch)
@@ -26,7 +24,7 @@ func GetCourses(ctx context.Context, client *http.Client, client_id, client_secr
 	if err != nil {
 		return err
 	}
-	var apiResponse = &dataTypes.CourseAPIResponse{}
+	var apiResponse = &CourseAPIResponse{}
 	err = json.NewDecoder(resp.Body).Decode(apiResponse)
 	if err != nil {
 		return err
