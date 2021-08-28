@@ -1,5 +1,9 @@
 package internal
 
+import (
+	"golang.org/x/net/html"
+)
+
 type CourseAPIResponse struct {
 	Count    int       `json:"count"`
 	Next     *string   `json:"next"`
@@ -8,23 +12,37 @@ type CourseAPIResponse struct {
 }
 
 type Course struct {
-	Class                string             `json:"_class" csv:"class"`
-	Title                string             `json:"title" csv:"title"`
-	PublishedTitle       string             `json:"published_title" csv:"published_title"`
-	Headline             string             `json:"headline" csv:"headline"`
-	Id                   int                `json:"id" csv:"id"`
-	Url                  string             `json:"url" csv:"url"`
-	InstructorName       string             `json:"instructor_name" csv:"instructor_name"`
-	VisibleInstructors   []CourseInstructor `json:"visible_instructors" csv:"visible_instructors"`
-	IsPaid               bool               `json:"is_paid" csv:"is_paid"`
-	Price                string             `json:"price" csv:"price"`
-	PriceDetail          CoursePriceDetail  `json:"price_detail" csv:"price_detail"`
-	Image125H            string             `json:"image_125_H" csv:"image_125_H"`
-	Image240x135         string             `json:"image_240x135" csv:"image_240x135"`
-	Image480x270         string             `json:"image_480x270" csv:"image_480x270"`
-	IsPracticeTestCourse bool               `json:"is_practice_test_course" csv:"is_practice_test_course"`
-	CurriculumLectures   []string           `json:"curriculum_lectures" csv:"curriculum_lectures"`
-	CurriculumItems      []string           `json:"curriculum_items" csv:"curriculum_items"`
+	Id                                 int               `json:"id" csv:"id"`
+	Url                                string            `json:"url" csv:"url"`
+	Title                              string            `json:"title" csv:"title"`
+	PublishedTitle                     string            `json:"published_title" csv:"published_title"`
+	Headline                           string            `json:"headline" csv:"headline"`
+	InstructorName                     string            `json:"instructor_name" csv:"instructor_name"`
+	Description                        *Description      `json:"description" csv:"description"`
+	PrimaryCategory                    *CourseCategory   `json:"primary_category" csv:"primary_category"`
+	PrimarySubcategory                 *CourseCategory   `json:"primary_subcategory" csv:"primary_subcategory"`
+	CaptionLanguages                   []string          `json:"caption_languages" csv:"caption_languages"`
+	NumLectures                        int               `json:"num_lectures" csv:"num_lectures"`
+	NumAssignments                     int               `json:"num_assignments" csv:"num_assignments"`
+	NumCodingExercises                 int               `json:"num_coding_exercises" csv:"num_coding_exercises"`
+	NumQuizzes                         int               `json:"num_quizzes" csv:"num_quizzes"`
+	PublishedTime                      string            `json:"published_time" csv:"published_time"`
+	LastUpdateDate                     string            `json:"last_update_date" csv:"last_update_date"`
+	IsPaid                             bool              `json:"is_paid" csv:"is_paid"`
+	Price                              string            `json:"price" csv:"price"`
+	PriceDetail                        CoursePriceDetail `json:"price_detail" csv:"price_detail"`
+	NumSubscribers                     int               `json:"num_subscribers" csv:"num_subscribers"`
+	NumReviews                         int               `json:"num_reviews" csv:"num_reviews"`
+	Rating                             float32           `json:"rating" csv:"rating"`
+	AverageRating                      float32           `json:"avg_rating" csv:"avg_rating"`
+	CompletionRatio                    float32           `json:"completion_ratio" csv:"completion_ratio"`
+	ContentInfo                        string            `json:"content_info" csv:"content_info"`
+	ContentInfoShort                   string            `json:"content_info_short" csv:"content_info_short"`
+	ContentLengthVideo                 int               `json:"content_length_video" csv:"content_length_video"`
+	ContentLengthPracticeTestQuestions int               `json:"content_length_practice_test_questions" csv:"content_length_practice_test_questions"`
+	EstimatedContentLength             int               `json:"estimated_content_length" csv:"estimated_content_length"`
+	Image125H                          string            `json:"image_125_H" csv:"image_125_H"`
+	Image100x100                       string            `json:"image_100x100" csv:"image_100x100"`
 }
 
 type CoursePriceDetail struct {
@@ -34,14 +52,20 @@ type CoursePriceDetail struct {
 	CurrencySymbol string  `json:"currency_symbol" csv:"currency_symbol"`
 }
 
-type CourseInstructor struct {
-	Class        string `json:"_class" csv:"class"`
-	Name         string `json:"name" csv:"name"`
-	DisplayName  string `json:"display_name" csv:"display_name"`
-	Initials     string `json:"initials" csv:"initials"`
-	Title        string `json:"title" csv:"title"`
-	JobTitle     string `json:"job_title" csv:"job_title"`
-	Image50x50   string `json:"image_50x50" csv:"image_50x50"`
-	Image100x100 string `json:"image_100x100" csv:"image_100x100"`
-	Url          string `json:"url" csv:"url"`
+type CourseCategory struct {
+	Id           int    `json:"id" csv:"category_id"`
+	ChannelId    int    `json:"channel_id" csv:"channel_id"`
+	IconClass    string `json:"icon_class" csv:"icon_class"`
+	Title        string `json:"title" csv:"category_title"`
+	TitleCleaned string `json:"title_cleaned" csv:"category_title_cleaned"`
+	Type         string `json:"type" csv:"category_type"`
+	Url          string `json:"url" csv:"category_url"`
+}
+
+type Description string
+
+func (description *Description) UnmarshalJSON(data []byte) error {
+	escapedDescription := html.EscapeString(string(data))
+	*description = Description(escapedDescription)
+	return nil
 }

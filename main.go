@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"time"
 
 	internal "github.com/AnesBenmerzoug/udemy-api-data/internal"
 	"github.com/gocarina/gocsv"
@@ -34,48 +33,18 @@ func init() {
 func main() {
 	client := &http.Client{}
 	context := context.Background()
-	coursesChannel := make(chan *internal.Course, 100)
 	coursesFile, err := os.OpenFile(COURSES_DATA_FILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
 	defer coursesFile.Close()
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
-	go func() {
-		err := internal.GetCourses(context, client, CLIENT_ID, CLIENT_SECRET, coursesChannel)
-		if err != nil {
-			log.Fatalf("error: %v\n", err)
-		}
-	}()
-	var courses []*internal.Course
-	for {
-		select {
-		case course, ok := <-coursesChannel:
-			if !ok {
-				coursesChannel = nil
-
-			}
-			courses = append(courses, course)
-		case <-time.After(3 * time.Second):
-		}
-
-		if len(courses) >= 100 {
-			log.Print("Appending Courses data to file")
-			err = gocsv.MarshalFile(&courses, coursesFile)
-			if err != nil {
-				log.Fatalf("error: %v\n", err)
-			}
-			courses = nil
-		}
-
-		if coursesChannel == nil {
-			if len(courses) > 0 {
-				err = gocsv.MarshalFile(&courses, coursesFile)
-				if err != nil {
-					log.Fatalf("error: %v\n", err)
-				}
-			}
-			courses = nil
-			break
-		}
+	courses, err := internal.GetCourses(context, client, CLIENT_ID, CLIENT_SECRET)
+	if err != nil {
+		log.Fatalf("error: %v\n", err)
+	}
+	log.Print("Writing Courses data to file")
+	err = gocsv.MarshalFile(courses, coursesFile)
+	if err != nil {
+		log.Fatalf("error: %v\n", err)
 	}
 }
