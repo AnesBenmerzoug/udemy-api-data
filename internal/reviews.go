@@ -3,20 +3,20 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
 )
 
-func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret string) ([]*Course, error) {
-	log.Print("Getting Courses data from the api")
-	var courses []*Course
+func GetReviews(ctx context.Context, client *http.Client, courseId int, clientId, clientSecret string) ([]*Review, error) {
+	log.Print("Getting Reviews data from the api")
+	var reviews []*Review
 
-	coursesUrl := "https://www.udemy.com/api-2.0/courses/"
+	reviewsUrl := fmt.Sprintf("https://www.udemy.com/api-2.0/courses/%v/reviews", courseId)
 	queryParameters := url.Values{}
 	queryParameters.Add("page_size", "25")
-	queryParameters.Add("fields[course]", "@all")
 	encodedQueryParams := queryParameters.Encode()
 
 	try := 0
@@ -29,7 +29,7 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 	for {
 		try++
 		log.Printf("Attempt %v", try)
-		resp, err = makeRequest(ctx, client, coursesUrl, &encodedQueryParams, clientId, clientSecret)
+		resp, err = makeRequest(ctx, client, reviewsUrl, &encodedQueryParams, clientId, clientSecret)
 		if err != nil {
 			if try < maxAttempts {
 				log.Print(err)
@@ -42,7 +42,7 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 		break
 	}
 
-	var apiResponse = &CourseAPIResponse{}
+	var apiResponse = &ReviewAPIResponse{}
 
 	err = json.NewDecoder(resp.Body).Decode(apiResponse)
 	if err != nil {
@@ -51,7 +51,7 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 	}
 	resp.Body.Close()
 
-	courses = append(courses, apiResponse.Courses...)
+	reviews = append(reviews, apiResponse.Reviews...)
 	page := 2
 
 	for apiResponse.Next != nil {
@@ -82,8 +82,13 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 			return nil, err
 		}
 		resp.Body.Close()
-		courses = append(courses, apiResponse.Courses...)
+		reviews = append(reviews, apiResponse.Reviews...)
 		page++
 	}
-	return courses, nil
+
+	for _, review := range reviews {
+		review.CourseId = courseId
+	}
+
+	return reviews, nil
 }

@@ -45,6 +45,14 @@ type Course struct {
 	Image100x100                       string            `json:"image_100x100" csv:"image_100x100"`
 }
 
+type Description string
+
+func (description *Description) UnmarshalJSON(data []byte) error {
+	escapedDescription := html.EscapeString(string(data))
+	*description = Description(escapedDescription)
+	return nil
+}
+
 type CoursePriceDetail struct {
 	PriceString    string  `json:"price_string" csv:"price_string"`
 	Amount         float32 `json:"amount" csv:"amount"`
@@ -62,10 +70,19 @@ type CourseCategory struct {
 	Url          string `json:"url" csv:"category_url"`
 }
 
-type Description string
+type ReviewAPIResponse struct {
+	Count    int       `json:"count"`
+	Next     *string   `json:"next"`
+	Previous *string   `json:"previous"`
+	Reviews  []*Review `json:"results"`
+}
 
-func (description *Description) UnmarshalJSON(data []byte) error {
-	escapedDescription := html.EscapeString(string(data))
-	*description = Description(escapedDescription)
-	return nil
+type Review struct {
+	CourseId int     `json:"course_id" csv:"course_id"`
+	Id       int     `json:"id" csv:"id"`
+	Title    string  `json:"title" csv:"title"`
+	Content  string  `json:"content" csv:"content"`
+	Rating   float32 `json:"rating" csv:"rating"`
+	Created  string  `json:"created" csv:"created"`
+	Modified string  `json:"modified" csv:"modified"`
 }
