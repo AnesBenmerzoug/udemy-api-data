@@ -36,13 +36,13 @@ func main() {
 	client := &http.Client{}
 	context := context.Background()
 
-	coursesFile, err := os.OpenFile(COURSES_DATA_FILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
+	coursesFile, err := os.OpenFile(COURSES_DATA_FILE, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	defer coursesFile.Close()
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
 
-	reviewsFile, err := os.OpenFile(REVIEWS_DATA_FILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0777)
+	reviewsFile, err := os.OpenFile(REVIEWS_DATA_FILE, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	defer reviewsFile.Close()
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
