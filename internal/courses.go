@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -44,9 +45,16 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 
 	var apiResponse = &CourseAPIResponse{}
 
-	err = json.NewDecoder(resp.Body).Decode(apiResponse)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed parsing api data: %v", err)
+		log.Print(string(body))
+		return nil, err
+	}
+	err = json.Unmarshal(body, apiResponse)
+	if err != nil {
+		log.Printf("Failed parsing api data: %v", err)
+		log.Print(string(body))
 		return nil, err
 	}
 	resp.Body.Close()
@@ -75,10 +83,16 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 			break
 		}
 
-		err = json.NewDecoder(resp.Body).Decode(apiResponse)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			log.Printf("Failed parsing api data: %v", err)
-			log.Print(resp.Body)
+			log.Print(string(body))
+			return nil, err
+		}
+		err = json.Unmarshal(body, apiResponse)
+		if err != nil {
+			log.Printf("Failed parsing api data: %v", err)
+			log.Print(string(body))
 			return nil, err
 		}
 		resp.Body.Close()
