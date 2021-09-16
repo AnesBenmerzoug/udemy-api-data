@@ -12,17 +12,19 @@ type CourseAPIResponse struct {
 }
 
 type Course struct {
-	Id                                 int          `json:"id" yaml:"course_id"`
-	Url                                string       `json:"url" yaml:"url"`
-	Title                              string       `json:"title" yaml:"title"`
-	PublishedTitle                     string       `json:"published_title" yaml:"published_title"`
-	Headline                           string       `json:"headline" yaml:"headline"`
-	InstructorName                     string       `json:"instructor_name" yaml:"instructor_name"`
-	Description                        *Description `json:"description" yaml:"description"`
-	InstructionalLevel                 string       `json:"instructional_level" yaml:"instructional_level"`
-	InstructionalLevelSimple           string       `json:"instructional_level_simple" yaml:"instructional_level_simple"`
-	Prerequisites                      []string     `json:"prerequisites" yaml:"prerequisites"`
-	Objectives                         []string
+	Id                                 int                `json:"id" yaml:"course_id"`
+	Url                                string             `json:"url" yaml:"url"`
+	Title                              string             `json:"title" yaml:"title"`
+	PublishedTitle                     string             `json:"published_title" yaml:"published_title"`
+	Headline                           EscapedString      `json:"headline" yaml:"headline"`
+	VisibleInstructors                 []Instructor       `json:"visible_instructors" yaml:"visible_instructors"`
+	Description                        *EscapedString     `json:"description" yaml:"description"`
+	InstructionalLevel                 string             `json:"instructional_level" yaml:"instructional_level"`
+	InstructionalLevelSimple           string             `json:"instructional_level_simple" yaml:"instructional_level_simple"`
+	Prerequisites                      []string           `json:"prerequisites" yaml:"prerequisites"`
+	Objectives                         []string           `json:"objectives" yaml:"objectives"`
+	TargetAudiences                    []string           `json:"target_audiences" yaml:"target_audiences"`
+	HasSufficientPreviewLength         bool               `json:"has_sufficient_preview_length" yaml:"has_sufficient_preview_length"`
 	PrimaryCategory                    *CourseCategory    `json:"primary_category" yaml:"primary_category"`
 	PrimarySubcategory                 *CourseSubCategory `json:"primary_subcategory" yaml:"primary_subcategory"`
 	HasClosedCaption                   bool               `json:"has_closed_caption" yaml:"has_closed_caption"`
@@ -52,12 +54,19 @@ type Course struct {
 	Image100x100                       string             `json:"image_100x100" yaml:"image_100x100"`
 }
 
-type Description string
+type EscapedString string
 
-func (description *Description) UnmarshalJSON(data []byte) error {
-	escapedDescription := html.EscapeString(string(data))
-	*description = Description(escapedDescription)
+func (content *EscapedString) UnmarshalJSON(data []byte) error {
+	escapedContent := html.EscapeString(string(data))
+	*content = EscapedString(escapedContent)
 	return nil
+}
+
+type Instructor struct {
+	Title       string `json:"title" yaml:"instructor_title"`
+	Name        string `json:"name" yaml:"instructor_name"`
+	DisplayName string `json:"display_name" yaml:"instructor_display_name"`
+	JobTitle    string `json:"job_title" yaml:"instructor_job_title"`
 }
 
 type CoursePriceDetail struct {
