@@ -55,7 +55,7 @@ func GetReviews(ctx context.Context, client *http.Client, courseId int, clientId
 	page := 2
 
 	for apiResponse.Next != nil {
-		log.Printf("Getting Courses data for page %v", page)
+		log.Printf("Getting Reviews data for page %v", page)
 
 		try := 0
 

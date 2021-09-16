@@ -15,7 +15,7 @@ func GetCourses(ctx context.Context, client *http.Client, clientId, clientSecret
 
 	coursesUrl := "https://www.udemy.com/api-2.0/courses/"
 	queryParameters := url.Values{}
-	queryParameters.Add("page_size", "25")
+	queryParameters.Add("page_size", "1")
 	queryParameters.Add("fields[course]", "@all")
 	encodedQueryParams := queryParameters.Encode()
 

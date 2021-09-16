@@ -8,16 +8,16 @@ import (
 	"path"
 
 	internal "github.com/AnesBenmerzoug/udemy-api-data/internal"
-	"github.com/gocarina/gocsv"
 	"github.com/joho/godotenv"
+	"gopkg.in/yaml.v2"
 )
 
 const DATA_DIR = "data"
 
 var (
 	CLIENT_ID, CLIENT_SECRET string
-	COURSES_DATA_FILE        = path.Join(DATA_DIR, "courses.csv")
-	REVIEWS_DATA_FILE        = path.Join(DATA_DIR, "reviews.csv")
+	COURSES_DATA_FILE        = path.Join(DATA_DIR, "courses.yaml")
+	REVIEWS_DATA_FILE        = path.Join(DATA_DIR, "reviews.yaml")
 )
 
 func init() {
@@ -53,7 +53,11 @@ func main() {
 		log.Fatalf("error: %v\n", err)
 	}
 	log.Print("Writing Courses data to file")
-	err = gocsv.MarshalFile(courses, coursesFile)
+	coursesYamlBytes, err := yaml.Marshal(courses)
+	if err != nil {
+		log.Fatalf("error: %v\n", err)
+	}
+	_, err = coursesFile.Write(coursesYamlBytes)
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
@@ -68,7 +72,11 @@ func main() {
 		allReviews = append(allReviews, reviews...)
 	}
 	log.Print("Writing Reviews data to file")
-	err = gocsv.MarshalFile(allReviews, reviewsFile)
+	reviewsYamlBytes, err := yaml.Marshal(allReviews)
+	if err != nil {
+		log.Fatalf("error: %v\n", err)
+	}
+	_, err = reviewsFile.Write(reviewsYamlBytes)
 	if err != nil {
 		log.Fatalf("error: %v\n", err)
 	}
